@@ -582,7 +582,7 @@
     
     <div id="start" class="screen-content active">
         <div class="start-wrapper">
-            <img src="images/logos/logo1813.webp" alt="Liebertwolkwitz 1813 Logo" class="main-app-logo" onerror="handleImageError(this)">
+            <img src="images/logos/Logo1813.webp" alt="Liebertwolkwitz 1813 Logo" class="main-app-logo" onerror="handleImageError(this)">
             <h1 class="h1-center">Willkommen im<br>Jahre 1813!</h1>
             
             <p class="intro-text">Ihr habt das Dorf in eurer Hand: Programm, Lageplan, historische Hintergründe, Veranstaltungen und eure häufigsten Fragen.</p>
@@ -596,6 +596,31 @@
             
             <p class="intro-text">Euer Dorf im Jahre 1813, eure <span class="link-highlight" onclick="scrollToAbout('ueber-uns-eg')">Hofgenossenschaft</span> und eure <span class="link-highlight" onclick="scrollToAbout('ueber-uns-ev')">Lebendige Geschichte Wolks</span>.</p>
             
+            <!-- NEU: Countdown hier auf der Startseite eingebunden -->
+            <div class="card" style="margin: 25px 0; text-align: center;">
+                <h3 style="margin-top:0; font-family: 'Vollkorn', serif;">Der Countdown läuft...</h3>
+                <p style="margin-bottom: 10px; font-size: 13px; color: var(--text-muted);">Seid live dabei, wenn sich die Tore für das nächste Dorf im Jahre 1813 öffnen!</p>
+                <div class="countdown-box" id="cd-timer-box" style="display:none; justify-content: center; gap: 10px;">
+                    <div class="cd-item">
+                        <div class="cd-number" id="cd-days">00</div>
+                        <div class="cd-label">Tage</div>
+                    </div>
+                    <div class="cd-item">
+                        <div class="cd-number" id="cd-hours">00</div>
+                        <div class="cd-label">Std</div>
+                    </div>
+                    <div class="cd-item">
+                        <div class="cd-number" id="cd-mins">00</div>
+                        <div class="cd-label">Min</div>
+                    </div>
+                    <div class="cd-item">
+                        <div class="cd-number" id="cd-secs">00</div>
+                        <div class="cd-label">Sek</div>
+                    </div>
+                </div>
+                <div class="cd-message" id="cd-message"></div>
+            </div>
+
             <hr class="content-divider" style="border-top: 2px solid var(--accent); width: 60px; margin: 40px auto 30px auto;">
         </div>
         
@@ -604,7 +629,7 @@
             
             <h3 id="ueber-uns-eg">Hofgenossenschaft Stiftsgut Liebertwolkwitz eG</h3>
             <p><em>(kurz: Hofgenossenschaft)</em></p>
-            <img src="images/logos/logoeg.webp" alt="Logo eG" class="small-app-logo" onerror="handleImageError(this)">
+            <img src="images/logos/Logoeg.webp" alt="Logo eG" class="small-app-logo" onerror="handleImageError(this)">
             <p>Wir haben uns 2010 mit dem Ziel gegründet, historische Veranstaltungen zu ermöglichen und unser Stiftsgut aus- und umzubauen. Seit 2012 sind wir im Besitz des Geländes und seit 2008 veranstalten wir unsere historischen Märkte sowie viele weitere Kulturveranstaltungen. <br> Alle Beteiligten sind mit viel Herzblut ehrenamtlich dabei. Deswegen fühlt sich unser Dorf auch so echt an: weil richtig viel Zeit & Liebe drin steckt.</p>
             <p style="clear: both;">Weitere Infos: <a href="https://www.hofgenossenschaft.com" target="_blank">www.hofgenossenschaft.com</a></p>
             
@@ -612,7 +637,7 @@
             
             <h3 id="ueber-uns-ev">Liebertwolkwitzer Verein für lebendige Geschichte e.V.</h3>
             <p><em>(kurz: Lebendige Geschichte Wolks)</em></p>
-            <img src="images/logos/logoev.webp" alt="Logo e.V." class="small-app-logo" onerror="handleImageError(this)">
+            <img src="images/logos/Logoev.webp" alt="Logo e.V." class="small-app-logo" onerror="handleImageError(this)">
             <p>Wir haben uns 2024 gegründet und verfolgen das Ziel, die Geschichte unserer Region zu erforschen und das erlangte Wissen möglichst vielen zugänglich zu machen. <br> Ein besonderer Fokus unserer Arbeit liegt auf dem Leben um 1800, weshalb wir das "Dorf im Jahre 1813" tatkräftig unterstützen. Außerhalb vom Oktober bieten wir eine breite Palette an Veranstaltungen (Schul-Hof, Führungen, Lesungen) und mit unseren Onlineangeboten wollen wir Geschichte für jede und jeden greifbar machen.</p>
             <p style="clear: both;">Weitere Infos: <a href="https://www.lebendigegeschichte-lww.de" target="_blank">www.lebendigegeschichte-lww.de</a></p>
         </div>
@@ -651,7 +676,8 @@
             <div id="sub-btn-faq" class="sub-grid-item" onclick="switchSubTabEvent('sub-faq', this)">❓ Fragen</div>
             
             <div id="sub-btn-umfrage" class="sub-grid-item" onclick="switchSubTabEvent('sub-umfrage', this)">🖊️ Umfrage</div>
-            <div id="sub-btn-countdown" class="sub-grid-item" onclick="switchSubTabEvent('sub-countdown', this)">⏳ Countdown</div>
+            <!-- NEU: ÖPNV Tab ersetzt Countdown -->
+            <div id="sub-btn-opnv" class="sub-grid-item" onclick="switchSubTabEvent('sub-opnv', this)">🚌🚂 ÖPNV</div>
         </div>
 
         <div id="sub-programm" class="sub-content active">
@@ -663,6 +689,7 @@
 
         <div id="sub-lageplan" class="sub-content">
             <div class="map-hint">💡 Nutze zwei Finger, um die Karte zu bewegen und zu zoomen.</div>
+            <!-- Das Fallback-System für den Lageplan übernimmt nun das Script checkOnlineStatusForMaps(), falls das Netzwerk weg ist -->
             <iframe class="map-iframe" style="width: 100%; height: 340px; border: 0; border-radius: 10px;" allowfullscreen allow="geolocation" src="https://umap.openstreetmap.de/de/map/karte-dorf-im-jahre-1813_141462?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&homeControl=false&captionControl=false&locateControl=true"></iframe>
         </div>
 
@@ -698,32 +725,6 @@
             <div id="location-list" style="margin-top: 15px;"></div>
         </div>
 
-        <div id="sub-countdown" class="sub-content">
-            <h2>Der Countdown läuft...</h2>
-            <p>Seid live dabei, wenn sich die Tore für das nächste Dorf im Jahre 1813 öffnen!</p>
-            
-            <div class="countdown-box" id="cd-timer-box" style="display:none;">
-                <div class="cd-item">
-                    <div class="cd-number" id="cd-days">00</div>
-                    <div class="cd-label">Tage</div>
-                </div>
-                <div class="cd-item">
-                    <div class="cd-number" id="cd-hours">00</div>
-                    <div class="cd-label">Std</div>
-                </div>
-                <div class="cd-item">
-                    <div class="cd-number" id="cd-mins">00</div>
-                    <div class="cd-label">Min</div>
-                </div>
-                <div class="cd-item">
-                    <div class="cd-number" id="cd-secs">00</div>
-                    <div class="cd-label">Sek</div>
-                </div>
-            </div>
-            
-            <div class="cd-message" id="cd-message"></div>
-        </div>
-
         <div id="sub-faq" class="sub-content">
             <h2>Häufige Fragen (FAQ)</h2>
             <div id="faq-list">
@@ -738,10 +739,42 @@
                 📋 Zur Umfrage
             </a>
         </div>
+
+        <!-- NEU: Der ÖPNV Tab mit Bus & Zug -->
+        <div id="sub-opnv" class="sub-content">
+            <h2>Abfahrtszeiten Live</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Hier siehst du die nächsten Abfahrten direkt vor Ort.</p>
+            
+            <!-- Bus Monitor -->
+            <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #fbc10f;" open>
+                <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
+                    <span>🚍 Bus (Schwarzes Ross)</span>
+                </summary>
+                <div style="padding: 5px; background: var(--bg-card);">
+                    <!-- Fehler-Sicherung für den Bus-Iframe -->
+                    <div id="bus-iframe-container" style="position: relative; width: 100%; height: 600px;">
+                        <iframe src="https://stationboard.l.de/monitor/0012542?bgh=fbc10f&ch=032c58&headertext=Schwarzes%20Ross&showheader=1&bgodd=094d98&codd=ffffff&bgeven=093f70&ceven=ffffff&bgsh=09477f&csh=ffffff&numrows=5&walktime=0&showtrack=0&showtransportType=0&transporttypes=bahn_bus_sbahn_tram_rufbus" 
+                                style="width: 100%; height: 100%; border: none; border-radius: 6px;"
+                                id="bus-monitor-frame">
+                        </iframe>
+                    </div>
+                </div>
+            </details>
+
+           <!-- Zug Monitor -->
+            <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #094d98;">
+                <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
+                    <span>🚆 Zug (Bahnhof Liebertwolkwitz)</span>
+                </summary>
+                <div style="text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 14px; font-style: italic;">
+    Diese Haltestelle wird gerade errichtet 🔨
+</div>
+            </details>
+        </div>
     </div>
 
     <div id="veranstaltungen" class="screen-content">
-        <h1>Veranstaltungen 2026</h1>
+        <h1>Veranstaltungen auf dem Stiftsgut</h1>
         <p style="font-size: 16px; font-weight: 500; line-height: 1.5; margin-bottom: 20px;">Hier findet ihr alle weiteren Märkte und Veranstaltungen außerhalb des großen Festwochenendes im Oktober.</p>
         
         <input type="text" id="search-yearly" class="search-input" placeholder="🔍 Nach Titel, Ort oder Veranstalter durchsuchen..." onkeyup="renderYearlyEvents()">
@@ -794,32 +827,9 @@
             <h2>Chronik der Völkerschlacht</h2>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Die wichtigsten historischen Meilensteine rund um Liebertwolkwitz 1813.</p>
             
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <span class="timeline-date">14. Oktober 1813</span>
-                        Das größte Kavalleriegefecht der Weltgeschichte entbrennt in der südlichen Ebene vor Liebertwolkwitz.
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <span class="timeline-date">16. Oktober 1813</span>
-                        Die blutigen Gefechte ziehen sich bis in den Dorfkern von Liebertwolkwitz.
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <span class="timeline-date">18. Oktober 1813</span>
-                        Entscheidungstag: Die Franzosen haben sich am 17. weiter nach Leipzig zurückgezogen und die verbündeten Truppen drängen die französische Armee immer weiter zurück in Richtung Leipzig. Trotzdem können die Franzosen z.B. Probstheida halten.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card" style="border-left-color: #777; margin-top: 20px; font-style: italic; font-size:12px;">
-                (Dieser Zeitstrahl wird noch mit detaillierten Fakten gefüllt!)
+            <!-- NEU: Dynamische Chronik-Liste aus Google Sheets -->
+            <div id="timeline-list">
+                <div class="loader">Chronik wird aus dem Archiv geholt...</div>
             </div>
         </div>
     </div>
@@ -935,11 +945,13 @@
     const LEXIKON_URL = BASE_SCRIPT_URL + "?action=lexikon";
     const GAZETTE_URL = BASE_SCRIPT_URL + "?action=gazette";
     const COUNTDOWN_URL = BASE_SCRIPT_URL + "?action=countdown";
+    const TIMELINE_URL = BASE_SCRIPT_URL + "?action=timeline"; // NEU für Zeitstrahl
 
     let globalEvents = [];
     let globalLocations = [];
     let globalYearlyEvents = []; 
     let globalLexikon = [];
+    let globalTimeline = []; // NEU
     let detectedDays = []; 
     let currentDayIndex = 0; 
     let preLinktreeTab = 'start'; 
@@ -1036,6 +1048,7 @@
         fetchLexikonData(); 
         fetchGazetteData();
         fetchCountdownData();
+        fetchTimelineData(); // NEU
     }
 
     function loadFromCache() {
@@ -1059,6 +1072,9 @@
 
         const cCount = localStorage.getItem('cache-countdown');
         if(cCount) { const d = JSON.parse(cCount); startCountdown(d.datum, d.uhrzeit); }
+        
+        const cTime = localStorage.getItem('cache-timeline'); // NEU
+        if(cTime) { globalTimeline = JSON.parse(cTime); renderTimeline(); }
     }
 
     function parseGermanDate(dateStr, timeStr) {
@@ -1351,8 +1367,8 @@
             statusContainer.innerHTML = `
                 <div class="card" style="text-align:center; padding: 25px 15px; margin-top: 15px;">
                     <span style="font-size:35px;">🧡</span>
-                    <p style="margin-top:15px; font-weight:bold; font-size:16px;">Vielen Dank für euren Besuch des Dorfes im in diesem Jahr.</p>
-                    <p style="font-size:14px; color:var(--text-muted); line-height: 1.5;">Wir sitzen bereits fleißig am Programm für das nächste Dorf. Sobald jeder seinen Platz & Uhrzeit kennt, findet ihr hier das aktuelle Programm🧡</p>
+                    <p style="margin-top:15px; font-weight:bold; font-size:16px;">Vielen Dank für euren Besuch des Dorfes <br> in diesem Jahr.</p>
+                    <p style="font-size:14px; color:var(--text-muted); line-height: 1.5;">Wir sitzen bereits fleißig am Programm für das nächste Dorf. Sobald jeder seinen Platz & Uhrzeit kennt, seht ihr hier das aktuelle Programm. <br><br> Unter "Termine" findet ihr unsere Veranstaltungen <br> für das restliche Jahr</p>
                 </div>
             `;
             searchInput.style.display = 'none';
@@ -1617,8 +1633,6 @@
         renderLexikon();
     }
 
-    // NEU: Voll dynamisches Lexikon-System (Doppeltes Akkordeon)
-    // NEU: Voll dynamisches Lexikon-System (Doppeltes Akkordeon)
     function renderLexikon() {
         const container = document.getElementById('lexikon-list');
         if(!container) return;
@@ -1630,7 +1644,6 @@
             return;
         }
 
-        // 1. Filtern nach: anzeigen === 'ja' UND Suchbegriff
         let filtered = globalLexikon.filter(item => {
             const istAktiv = item.anzeigen && item.anzeigen.trim().toLowerCase() === 'ja';
             if (!istAktiv) return false;
@@ -1648,7 +1661,6 @@
             return;
         }
 
-        // 2. Gruppieren nach Kategorien (Spalte E)
         const groups = {};
         filtered.forEach(item => {
             const kat = (item.kategorie && item.kategorie.trim() !== "") ? item.kategorie.trim() : "Allgemein";
@@ -1658,33 +1670,26 @@
 
         const sortedKategorien = Object.keys(groups).sort((a, b) => a.localeCompare(b));
         
-        // ====================================================================
-        // HIER KANNST DU DEINE EMOJIS FÜR DIE KATEGORIEN SELBST FESTLEGEN
-        // ====================================================================
         const lexikonEmojis = {
             "Handwerk, Berufe, Tätigkeiten": "⚒️",
-		"Staaten, Politik, Maßeinheiten": "🗺️",
-		"Ereignisse": "🎲",
+            "Staaten, Politik, Maßeinheiten": "🗺️",
+            "Ereignisse": "🎲",
+            "Uniformen": "🪖",
             "Personen": "👤",
             "Militärische Begriffe": "🛡️",
             "Allgemein": "📖",
             "Orte & Denkmäler": "🏛️",
-		"Zivilleben": "🕊️",
-            // Füge einfach neue Zeilen hinzu, z.B.: "Häuser": "🏡",
-            // Das hier ist der Fallback, falls du mal vergisst eins einzutragen:
+            "Zivilleben": "🕊️",
             "Standard": "📂" 
         };
-        // ====================================================================
 
         let html = '';
 
-        // 3. Rendern der Kategorien (Akkordeon Ebene 1) und Einträge (Akkordeon Ebene 2)
         sortedKategorien.forEach(kat => {
             groups[kat].sort((a, b) => (a.eintrag || "").localeCompare(b.eintrag || ""));
             
             const isOpen = query.length >= 2 ? 'open' : '';
             
-            // Emoji aus dem Wörterbuch holen (oder Standard nehmen)
             const katEmoji = lexikonEmojis[kat] || lexikonEmojis["Standard"];
 
             html += `
@@ -1729,7 +1734,6 @@
                         saubererInhalt = '<div style="font-style: italic; color: var(--text-muted); margin-top: 5px;">🐎📖 Huch? Der Colporteur hat diesen Eintrag wohl noch nicht geliefert.</div>';
                     }
 
-                    // HIER WURDE DIE LUPE (🔍) VOR DEM EINTRAG ENTFERNT
                     html += `
                     <details class="faq-item" style="margin-bottom: 8px; border-left: 3px solid var(--text-muted); background: var(--bg-card);">
                         <summary style="padding: 12px 15px; font-size: 14px; font-weight: 500; cursor: pointer;">
@@ -1749,6 +1753,39 @@
             `;
         });
 
+        container.innerHTML = html;
+    }
+
+    // NEU: Rendering-Funktion für die dynamische Chronik (Zeitstrahl)
+    function renderTimeline() {
+        const container = document.getElementById('timeline-list');
+        if(!container) return;
+        container.innerHTML = "";
+        
+        // Filtert Einträge heraus, bei denen in Spalte D nicht "ja" steht
+        const filtered = globalTimeline.filter(item => {
+            return item.anzeigen && item.anzeigen.trim().toLowerCase() === 'ja';
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="loader">Noch keine Chronik-Einträge hinterlegt.</div>';
+            return;
+        }
+
+        let html = '<div class="timeline">';
+        filtered.forEach(item => {
+            html += `
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">${item.datum || ''}</span>
+                    <strong style="display:block; margin-bottom: 5px;">${item.titel || ''}</strong>
+                    <span style="white-space: pre-wrap;">${item.text || ''}</span>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        
         container.innerHTML = html;
     }
 
@@ -1879,6 +1916,20 @@
             }).catch(err => console.log("Fehler Countdown", err));
     }
 
+    // NEU: Fetch-Funktion für den dynamischen Zeitstrahl
+    function fetchTimelineData() {
+        fetch(TIMELINE_URL)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) return;
+                if (data && data.length > 0) {
+                    localStorage.setItem('cache-timeline', JSON.stringify(data));
+                    globalTimeline = data;
+                    renderTimeline();
+                }
+            }).catch(err => console.log("Fehler Chronik", err));
+    }
+
     function toggleDarkMode() {
         const phone = document.getElementById('phone');
         const icon = document.getElementById('theme-icon');
@@ -1890,6 +1941,33 @@
             icon.innerText = '🌙';
             localStorage.setItem('app-theme', 'light');
         }
+    }
+
+    // NEU: Überprüfung des ÖPNV-Widgets auf Erreichbarkeit (Fallback bei Netzwerk/Server-Problemen)
+    window.addEventListener('DOMContentLoaded', () => {
+        const busFrame = document.getElementById('bus-monitor-frame');
+        const container = document.getElementById('bus-iframe-container');
+        
+        if (busFrame && container) {
+            setTimeout(() => {
+                try {
+                    if (!navigator.onLine) {
+                        showOpnvFallback(container);
+                    }
+                } catch (e) {
+                    // Wird gefangen
+                }
+            }, 4000);
+        }
+    });
+
+    function showOpnvFallback(container) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 15px; background: rgba(0,0,0,0.03); border: 1px dashed var(--accent); border-radius: 8px; margin: 10px 0;">
+                <span style="font-size: 35px;">📯⏳</span>
+                <h3 style="margin-top: 10px; color: var(--accent);">Depeschen-Stau im Liniennetz</h3>
+                <p style="font-size: 13px; margin-bottom: 0;">Die Live-Abfahrtszeiten können zurzeit nicht zugestellt werden. Bitte schaut direkt an der Haltestelle auf den Aushang.</p>
+            </div>`;
     }
 </script>
 
