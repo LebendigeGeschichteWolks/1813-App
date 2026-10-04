@@ -218,6 +218,25 @@
             to { transform: translateY(0); }
         }
 
+        /* Pull to refresh Indicator */
+        #pull-indicator {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            height: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.05);
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--accent);
+            transition: height 0.2s ease, opacity 0.2s ease;
+            z-index: 80;
+        }
+
         .screen-content {
             flex: 1;
             padding: 15px;
@@ -510,12 +529,34 @@
             object-fit: cover;
         }
 
-        .timeline { position: relative; padding-left: 20px; margin-top: 20px; }
-        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); }
-        .timeline-item { position: relative; margin-bottom: 25px; }
-        .timeline-dot { position: absolute; left: -26px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--accent); }
-        .timeline-content { background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; line-height: 1.5; color: var(--text-main); }
-        .timeline-date { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: block;}
+        /* Timeline / Zeitstrahl Styling */
+.timeline { position: relative; padding-left: 20px; margin-top: 20px; }
+.timeline-item { position: relative; margin-bottom: 25px; }
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    bottom: -25px;
+    width: 2px;
+    background: var(--accent);
+}
+.timeline-item.is-last { margin-bottom: 0; }
+.timeline-item.is-last::before { display: none; }
+.timeline-dot { 
+    position: absolute; 
+    left: -26px; 
+    top: 0; 
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background: var(--bg-card); 
+    border: 2px solid var(--accent); 
+    z-index: 1; 
+}
+.timeline-item.is-last .timeline-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--bg-card); }
+.timeline-content { background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; line-height: 1.5; color: var(--text-main); }
+.timeline-date { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: block;}
 
         .content-divider { border: 0; border-top: 1px solid var(--divider-color); margin: 25px 0; }
 
@@ -531,7 +572,7 @@
         .impressum-divider { border: 0; border-top: 1px solid var(--border-color); margin: 15px 0; }
         .loader { text-align: center; font-style: italic; color: var(--text-muted); padding: 20px; }
 
-        /* Karten Hinweis und Countdown Styles */
+        /* Karten Hinweis, Consent und Countdown Styles */
         .map-hint {
             font-size: 14px; 
             font-weight: 500;
@@ -542,6 +583,22 @@
             border-radius: 8px;
             padding: 8px;
             border: 1px solid var(--border-color);
+        }
+        
+        .map-consent-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 12px;
+        }
+        
+        .map-consent-box p {
+            margin: 8px 0;
+            font-size: 13px;
         }
         
         .countdown-box {
@@ -579,6 +636,9 @@
         <span style="font-size: 20px; color: #ff4d4d;">🕊️</span> 
         <span><strong>Gurrr... wir haben die Verbindung verloren, ich arbeite dran!</strong></span>
     </div>
+
+    <!-- NEU: Pull to refresh Indicator -->
+    <div id="pull-indicator">🐎 Ziehen zum Aktualisieren...</div>
     
     <div id="start" class="screen-content active">
         <div class="start-wrapper">
@@ -596,7 +656,7 @@
             
             <p class="intro-text">Euer Dorf im Jahre 1813, eure <span class="link-highlight" onclick="scrollToAbout('ueber-uns-eg')">Hofgenossenschaft</span> und eure <span class="link-highlight" onclick="scrollToAbout('ueber-uns-ev')">Lebendige Geschichte Wolks</span>.</p>
             
-            <!-- NEU: Countdown hier auf der Startseite eingebunden -->
+            <!-- Countdown -->
             <div class="card" style="margin: 25px 0; text-align: center;">
                 <h3 style="margin-top:0; font-family: 'Vollkorn', serif;">Der Countdown läuft...</h3>
                 <p style="margin-bottom: 10px; font-size: 13px; color: var(--text-muted);">Seid live dabei, wenn sich die Tore für das nächste Dorf im Jahre 1813 öffnen!</p>
@@ -621,6 +681,26 @@
                 <div class="cd-message" id="cd-message"></div>
             </div>
 
+            <!-- In-App Feedback-Formular -->
+            <div class="card" style="margin-top: 25px;" id="feedback-card">
+                <h3 style="margin-top:0;">✉️ Feedback & Depesche senden</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Euer Feedback hilft uns, die App und das Dorf noch besser zu machen.</p>
+                
+                <textarea id="fb-message" class="search-input" style="height: 90px; resize: none;" placeholder="Deine Nachricht an uns..."></textarea>
+                <input type="text" id="fb-contact" class="search-input" placeholder="Name / E-Mail (optional für Rückfragen)">
+                
+                <button class="feedback-btn" style="width: 100%; border: none; cursor: pointer; margin: 10px 0 0 0;" onclick="submitInAppFeedback()">
+                    ✉️ Absenden
+                </button>
+
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 10px; margin-bottom: 0; text-align: center;">
+                    Mit dem Absenden deiner Nachricht stimmst du der Verarbeitung deiner Daten durch uns zu. Weitere Infos unter 
+                    <a href="https://lebendigegeschichte-lww.de/datenschutz/" target="_blank" rel="noopener">https://lebendigegeschichte-lww.de/datenschutz/</a>
+                </p>
+
+                <div id="fb-status" style="display: none; margin-top: 10px; font-size: 13px; text-align: center; font-weight: bold;"></div>
+            </div>
+
             <hr class="content-divider" style="border-top: 2px solid var(--accent); width: 60px; margin: 40px auto 30px auto;">
         </div>
         
@@ -641,11 +721,6 @@
             <p>Wir haben uns 2024 gegründet und verfolgen das Ziel, die Geschichte unserer Region zu erforschen und das erlangte Wissen möglichst vielen zugänglich zu machen. <br> Ein besonderer Fokus unserer Arbeit liegt auf dem Leben um 1800, weshalb wir das "Dorf im Jahre 1813" tatkräftig unterstützen. Außerhalb vom Oktober bieten wir eine breite Palette an Veranstaltungen (Schul-Hof, Führungen, Lesungen) und mit unseren Onlineangeboten wollen wir Geschichte für jede und jeden greifbar machen.</p>
             <p style="clear: both;">Weitere Infos: <a href="https://www.lebendigegeschichte-lww.de" target="_blank">www.lebendigegeschichte-lww.de</a></p>
         </div>
-        
-        <a href="mailto:info@lebendigegeschichte-lww.de?subject=Feedback%20zur%20App%20Leipzig%201813" class="feedback-btn">
-            ✉️ Feedback zur App senden<br>
-            <small style="font-size: 10px; font-weight: normal;">Öffnet sich nichts? Dann einfach an info@lebendigegeschichte-lww.de schreiben</small>
-        </a>
 
         <div class="impressum-box">
             <h3>Impressum</h3>
@@ -676,7 +751,6 @@
             <div id="sub-btn-faq" class="sub-grid-item" onclick="switchSubTabEvent('sub-faq', this)">❓ Fragen</div>
             
             <div id="sub-btn-umfrage" class="sub-grid-item" onclick="switchSubTabEvent('sub-umfrage', this)">🖊️ Umfrage</div>
-            <!-- NEU: ÖPNV Tab ersetzt Countdown -->
             <div id="sub-btn-opnv" class="sub-grid-item" onclick="switchSubTabEvent('sub-opnv', this)">🚌🚂 ÖPNV</div>
         </div>
 
@@ -689,8 +763,27 @@
 
         <div id="sub-lageplan" class="sub-content">
             <div class="map-hint">💡 Nutze zwei Finger, um die Karte zu bewegen und zu zoomen.</div>
-            <!-- Das Fallback-System für den Lageplan übernimmt nun das Script checkOnlineStatusForMaps(), falls das Netzwerk weg ist -->
-            <iframe class="map-iframe" style="width: 100%; height: 340px; border: 0; border-radius: 10px;" allowfullscreen allow="geolocation" src="https://umap.openstreetmap.de/de/map/karte-dorf-im-jahre-1813_141462?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&homeControl=false&captionControl=false&locateControl=true"></iframe>
+            
+            <!-- NEU: 2-Klick uMap Integration für den Lageplan -->
+            <div class="map-container-wrapper">
+                <div class="map-consent-box">
+                    <p><strong>Externe Karte von umap/Openstreetmap. Durch Tippen auf "Laden" wird diese Karte geladen.</strong></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">
+                        Weitere Infos zu Betreiber, erhobenen Daten und Löschung dieser unter 
+                        <a href="https://www.fossgis.de/datenschutzerkl%C3%A4rung/" target="_blank" rel="noopener">https://www.fossgis.de/datenschutzerklärung/</a>
+                    </p>
+                    <button class="feedback-btn" style="margin: 15px auto 5px auto; width: 100%; max-width: 200px;" 
+                            onclick="loadUmap(this, 'https://umap.openstreetmap.de/de/map/karte-dorf-im-jahre-1813_141462?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=false&onLoadPanel=none&captionBar=false&captionMenus=false&homeControl=false&captionControl=false&locateControl=true')">
+                        🗺️ Laden
+                    </button>
+                </div>
+                <div class="map-frame-holder" style="display:none;"></div>
+            </div>
+
+            <!-- Vollbildoption -->
+            <p style="margin-top: 8px; font-size: 12px; text-align: center;">
+                <a href="https://umap.openstreetmap.de/de/map/karte-dorf-im-jahre-1813_141462" target="_blank" rel="noopener">Vollbildanzeige öffnen</a>
+            </p>
         </div>
 
         <div id="sub-wasistwo" class="sub-content">
@@ -740,18 +833,15 @@
             </a>
         </div>
 
-        <!-- NEU: Der ÖPNV Tab mit Bus & Zug -->
         <div id="sub-opnv" class="sub-content">
             <h2>Abfahrtszeiten Live</h2>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Hier siehst du die nächsten Abfahrten direkt vor Ort.</p>
             
-            <!-- Bus Monitor -->
             <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #fbc10f;" open>
                 <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
                     <span>🚍 Bus (Schwarzes Ross)</span>
                 </summary>
                 <div style="padding: 5px; background: var(--bg-card);">
-                    <!-- Fehler-Sicherung für den Bus-Iframe -->
                     <div id="bus-iframe-container" style="position: relative; width: 100%; height: 600px;">
                         <iframe src="https://stationboard.l.de/monitor/0012542?bgh=fbc10f&ch=032c58&headertext=Schwarzes%20Ross&showheader=1&bgodd=094d98&codd=ffffff&bgeven=093f70&ceven=ffffff&bgsh=09477f&csh=ffffff&numrows=5&walktime=0&showtrack=0&showtransportType=0&transporttypes=bahn_bus_sbahn_tram_rufbus" 
                                 style="width: 100%; height: 100%; border: none; border-radius: 6px;"
@@ -761,14 +851,13 @@
                 </div>
             </details>
 
-           <!-- Zug Monitor -->
             <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #094d98;">
                 <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
                     <span>🚆 Zug (Bahnhof Liebertwolkwitz)</span>
                 </summary>
                 <div style="text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 14px; font-style: italic;">
-    Diese Haltestelle wird gerade errichtet 🔨
-</div>
+                    Diese Haltestelle wird gerade errichtet 🔨
+                </div>
             </details>
         </div>
     </div>
@@ -796,8 +885,26 @@
 
         <div id="sub-hist-karte" class="sub-content active">
             <div class="map-hint">💡 Nutze zwei Finger, um die Karte zu bewegen und zu zoomen.</div>
-            <iframe class="map-iframe" style="width: 100%; height: 340px; border: 0; border-radius: 10px;" allowfullscreen allow="geolocation" src="https://umap.openstreetmap.de/de/map/apelsteine-inkl-bilder-ausfuhrlichen-informationen_94176?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true"></iframe>
-            <p style="margin-top: 5px; font-size: 12px; text-align: center;"><a href="https://umap.openstreetmap.de/de/map/apelsteine-inkl-bilder-ausfuhrlichen-informationen_94176?scaleControl=false&miniMap=false&scrollWheelZoom=true&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true" target="_blank">Vollbildanzeige öffnen</a></p>
+            
+            <!-- NEU: 2-Klick uMap Integration für die Apelsteine -->
+            <div class="map-container-wrapper">
+                <div class="map-consent-box">
+                    <p><strong>Externe Karte von umap/Openstreetmap. Durch Tippen auf "Laden" wird diese Karte geladen.</strong></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">
+                        Weitere Infos zu Betreiber, erhobenen Daten und Löschung dieser unter 
+                        <a href="https://www.fossgis.de/datenschutzerkl%C3%A4rung/" target="_blank" rel="noopener">https://www.fossgis.de/datenschutzerklärung/</a>
+                    </p>
+                    <button class="feedback-btn" style="margin: 15px auto 5px auto; width: 100%; max-width: 200px;" 
+                            onclick="loadUmap(this, 'https://umap.openstreetmap.de/de/map/apelsteine-inkl-bilder-ausfuhrlichen-informationen_94176?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true')">
+                        🗺️ Laden
+                    </button>
+                </div>
+                <div class="map-frame-holder" style="display:none;"></div>
+            </div>
+
+            <p style="margin-top: 8px; font-size: 12px; text-align: center;">
+                <a href="https://umap.openstreetmap.de/de/map/apelsteine-inkl-bilder-ausfuhrlichen-informationen_94176" target="_blank" rel="noopener">Vollbildanzeige öffnen</a>
+            </p>
         </div>
 
         <div id="sub-hist-lexikon" class="sub-content">
@@ -827,7 +934,6 @@
             <h2>Chronik der Völkerschlacht</h2>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Die wichtigsten historischen Meilensteine rund um Liebertwolkwitz 1813.</p>
             
-            <!-- NEU: Dynamische Chronik-Liste aus Google Sheets -->
             <div id="timeline-list">
                 <div class="loader">Chronik wird aus dem Archiv geholt...</div>
             </div>
@@ -945,13 +1051,13 @@
     const LEXIKON_URL = BASE_SCRIPT_URL + "?action=lexikon";
     const GAZETTE_URL = BASE_SCRIPT_URL + "?action=gazette";
     const COUNTDOWN_URL = BASE_SCRIPT_URL + "?action=countdown";
-    const TIMELINE_URL = BASE_SCRIPT_URL + "?action=timeline"; // NEU für Zeitstrahl
+    const TIMELINE_URL = BASE_SCRIPT_URL + "?action=timeline"; 
 
     let globalEvents = [];
     let globalLocations = [];
     let globalYearlyEvents = []; 
     let globalLexikon = [];
-    let globalTimeline = []; // NEU
+    let globalTimeline = []; 
     let detectedDays = []; 
     let currentDayIndex = 0; 
     let preLinktreeTab = 'start'; 
@@ -988,34 +1094,6 @@
         img.src = 'images/fallback/bildfb.webp';
     }
 
-    function checkOnlineStatusForMaps() {
-        const isOnline = navigator.onLine;
-        const maps = document.querySelectorAll('.map-iframe');
-        
-        maps.forEach(map => {
-            if (!isOnline) {
-                map.style.display = 'none';
-                if (!map.parentElement.querySelector('.map-fallback')) {
-                    const fb = document.createElement('div');
-                    fb.className = 'map-fallback';
-                    fb.style.textAlign = 'center';
-                    fb.style.padding = '15px';
-                    fb.style.backgroundColor = 'var(--bg-card)';
-                    fb.style.borderRadius = '10px';
-                    fb.style.border = '1px solid var(--border-color)';
-                    fb.innerHTML = `
-                        <img src="images/fallback/kartefb.webp" style="width:100%; border-radius: 8px; margin-bottom: 10px;" onerror="this.style.display='none';">
-                        <p style="font-weight:bold; margin:0; font-size:14px; color:var(--text-main);">Ich habe diese Karte wohl verloren. Prüfe deine Verbindung!📯</p>`;
-                    map.parentElement.appendChild(fb);
-                }
-            } else {
-                map.style.display = 'block';
-                const fb = map.parentElement.querySelector('.map-fallback');
-                if (fb) fb.remove();
-            }
-        });
-    }
-
     window.onload = function() {
         setTimeout(() => {
             const loader = document.getElementById('loading-overlay');
@@ -1048,7 +1126,7 @@
         fetchLexikonData(); 
         fetchGazetteData();
         fetchCountdownData();
-        fetchTimelineData(); // NEU
+        fetchTimelineData(); 
     }
 
     function loadFromCache() {
@@ -1073,7 +1151,7 @@
         const cCount = localStorage.getItem('cache-countdown');
         if(cCount) { const d = JSON.parse(cCount); startCountdown(d.datum, d.uhrzeit); }
         
-        const cTime = localStorage.getItem('cache-timeline'); // NEU
+        const cTime = localStorage.getItem('cache-timeline'); 
         if(cTime) { globalTimeline = JSON.parse(cTime); renderTimeline(); }
     }
 
@@ -1204,7 +1282,6 @@
         const banner = document.getElementById('pigeon-banner');
         if (navigator.onLine) banner.style.display = 'none';
         else banner.style.display = 'flex';
-        checkOnlineStatusForMaps(); 
     }
 
     function loadInitialData(eventsArray) {
@@ -1291,7 +1368,6 @@
         element.classList.add('active');
         localStorage.setItem('last-sub-tab-historic', subTabId);
         
-        // Aktualisiert das Lexikon beim Wechsel auf den Tab (um Styling-Probleme bei display:none zu umgehen)
         if (subTabId === 'sub-hist-lexikon') {
             renderLexikon();
         }
@@ -1756,13 +1832,12 @@
         container.innerHTML = html;
     }
 
-    // NEU: Rendering-Funktion für die dynamische Chronik (Zeitstrahl)
+    // NEU: Rendering-Funktion für die dynamische Chronik inkl. Abschluss ("is-last")
     function renderTimeline() {
         const container = document.getElementById('timeline-list');
         if(!container) return;
         container.innerHTML = "";
         
-        // Filtert Einträge heraus, bei denen in Spalte D nicht "ja" steht
         const filtered = globalTimeline.filter(item => {
             return item.anzeigen && item.anzeigen.trim().toLowerCase() === 'ja';
         });
@@ -1772,10 +1847,13 @@
             return;
         }
 
-        let html = '<div class="timeline">';
-        filtered.forEach(item => {
+        let html = '<div class="timeline" id="timeline-container">';
+        filtered.forEach((item, index) => {
+            const isLast = item.letztes === 'ja' || index === filtered.length - 1;
+            const lastClass = isLast ? 'is-last' : '';
+
             html += `
-            <div class="timeline-item">
+            <div class="timeline-item ${lastClass}">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content">
                     <span class="timeline-date">${item.datum || ''}</span>
@@ -1787,6 +1865,14 @@
         html += '</div>';
         
         container.innerHTML = html;
+
+        // Passt die vertikale Linie dynamisch an, damit sie genau beim letzten Punkt endet
+        const lastDot = container.querySelector('.timeline-item.is-last');
+        const timelineBox = container.querySelector('.timeline');
+        if (lastDot && timelineBox) {
+            const offsetTop = lastDot.offsetTop;
+            timelineBox.style.setProperty('--line-height', `${offsetTop}px`);
+        }
     }
 
     function showStarTooltip(event) {
@@ -1916,7 +2002,6 @@
             }).catch(err => console.log("Fehler Countdown", err));
     }
 
-    // NEU: Fetch-Funktion für den dynamischen Zeitstrahl
     function fetchTimelineData() {
         fetch(TIMELINE_URL)
             .then(response => response.json())
@@ -1943,7 +2028,68 @@
         }
     }
 
-    // NEU: Überprüfung des ÖPNV-Widgets auf Erreichbarkeit (Fallback bei Netzwerk/Server-Problemen)
+    // NEU: In-App Feedback senden Logik
+    function submitInAppFeedback() {
+        const msgInput = document.getElementById('fb-message');
+        const contactInput = document.getElementById('fb-contact');
+        const statusDiv = document.getElementById('fb-status');
+        
+        const msg = msgInput.value.trim();
+        const contact = contactInput.value.trim();
+
+        if (!msg) {
+            statusDiv.style.color = "var(--accent)";
+            statusDiv.innerText = "Bitte gib eine Nachricht ein.";
+            statusDiv.style.display = "block";
+            return;
+        }
+
+        statusDiv.style.color = "var(--text-main)";
+        statusDiv.innerText = "Depesche wird übermittelt...";
+        statusDiv.style.display = "block";
+
+        const url = `${BASE_SCRIPT_URL}?action=feedback&nachricht=${encodeURIComponent(msg)}&kontakt=${encodeURIComponent(contact)}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    statusDiv.style.color = "green";
+                    statusDiv.innerText = "Vielen Dank! Deine Depesche wurde zugestellt. 🐎";
+                    msgInput.value = "";
+                    contactInput.value = "";
+                } else {
+                    throw new Error();
+                }
+            })
+            .catch(() => {
+                statusDiv.style.color = "var(--accent)";
+                statusDiv.innerText = "Fehler beim Senden. Bitte prüfe deine Verbindung.";
+            });
+    }
+
+    // Lädt uMap dynamisch nach Einwilligung (2-Klick) oder zeigt bei Offline-Status das Fallback-Bild
+    function loadUmap(button, mapUrl) {
+        const wrapper = button.closest('.map-container-wrapper');
+        const consentBox = wrapper.querySelector('.map-consent-box');
+        const frameHolder = wrapper.querySelector('.map-frame-holder');
+
+        if (!navigator.onLine) {
+            frameHolder.innerHTML = `
+                <div class="map-fallback" style="text-align: center; padding: 15px; background-color: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color);">
+                    <img src="images/fallback/kartefb.webp" style="width:100%; border-radius: 8px; margin-bottom: 10px;" onerror="this.style.display='none';">
+                    <p style="font-weight:bold; margin:0; font-size:14px; color:var(--text-main);">Ich habe diese Karte wohl verloren. Prüfe deine Verbindung!📯</p>
+                </div>`;
+            consentBox.style.display = 'none';
+            frameHolder.style.display = 'block';
+            return;
+        }
+
+        frameHolder.innerHTML = `<iframe class="map-iframe" style="width: 100%; height: 340px; border: 0; border-radius: 10px;" allowfullscreen allow="geolocation" src="${mapUrl}"></iframe>`;
+        consentBox.style.display = 'none';
+        frameHolder.style.display = 'block';
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         const busFrame = document.getElementById('bus-monitor-frame');
         const container = document.getElementById('bus-iframe-container');
@@ -1954,9 +2100,7 @@
                     if (!navigator.onLine) {
                         showOpnvFallback(container);
                     }
-                } catch (e) {
-                    // Wird gefangen
-                }
+                } catch (e) {}
             }, 4000);
         }
     });
@@ -1969,6 +2113,60 @@
                 <p style="font-size: 13px; margin-bottom: 0;">Die Live-Abfahrtszeiten können zurzeit nicht zugestellt werden. Bitte schaut direkt an der Haltestelle auf den Aushang.</p>
             </div>`;
     }
+
+    // NEU: Pull to Refresh Logik
+    let touchStartY = 0;
+    let touchMoveY = 0;
+    const pullIndicator = document.getElementById('pull-indicator');
+
+    document.addEventListener('touchstart', (e) => {
+        const activeScreen = document.querySelector('.screen-content.active');
+        if (activeScreen && activeScreen.scrollTop === 0) {
+            touchStartY = e.touches[0].clientY;
+        } else {
+            touchStartY = 0;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!touchStartY) return;
+        touchMoveY = e.touches[0].clientY;
+        const distance = touchMoveY - touchStartY;
+
+        if (distance > 0 && distance < 120) {
+            pullIndicator.style.height = `${distance / 2}px`;
+            pullIndicator.innerText = distance > 80 ? "🐎 Loslassen zum Aktualisieren..." : "🐎 Ziehen zum Aktualisieren...";
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+        if (!touchStartY || !touchMoveY) return;
+        const distance = touchMoveY - touchStartY;
+
+        if (distance > 80) {
+            pullIndicator.style.height = "40px";
+            pullIndicator.innerText = "🔄 Daten werden aktualisiert...";
+            
+            // Lade alle Daten neu
+            fetchProgramData();
+            fetchLocationData();
+            fetchYearlyData();
+            fetchFaqData();
+            fetchLexikonData();
+            fetchGazetteData();
+            fetchCountdownData();
+            fetchTimelineData();
+
+            setTimeout(() => {
+                pullIndicator.style.height = "0";
+            }, 1200);
+        } else {
+            pullIndicator.style.height = "0";
+        }
+        touchStartY = 0;
+        touchMoveY = 0;
+    });
+
 </script>
 
 </body>
