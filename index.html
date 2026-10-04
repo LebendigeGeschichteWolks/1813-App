@@ -218,31 +218,37 @@
             to { transform: translateY(0); }
         }
 
-        /* Pull to refresh Indicator */
+        /* Pull-to-Refresh Indikator (liegt hinter der verschiebbaren Seite) */
         #pull-indicator {
             position: absolute;
             top: 50px;
             left: 0;
             right: 0;
-            height: 0;
-            overflow: hidden;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.05);
+            background-color: var(--bg-phone);
             font-size: 13px;
             font-weight: bold;
             color: var(--accent);
-            transition: height 0.2s ease, opacity 0.2s ease;
-            z-index: 80;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
+        /* Der Inhaltsbereich deckt den Indikator ab und lässt sich flüssig ziehen */
         .screen-content {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             display: none;
-            -webkit-overflow-scrolling: touch; 
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            z-index: 2;
+            background-image: var(--bg-pattern);
+            background-repeat: repeat;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .screen-content.active {
             display: block;
@@ -530,33 +536,33 @@
         }
 
         /* Timeline / Zeitstrahl Styling */
-.timeline { position: relative; padding-left: 20px; margin-top: 20px; }
-.timeline-item { position: relative; margin-bottom: 25px; }
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -22px;
-    top: 5px;
-    bottom: -25px;
-    width: 2px;
-    background: var(--accent);
-}
-.timeline-item.is-last { margin-bottom: 0; }
-.timeline-item.is-last::before { display: none; }
-.timeline-dot { 
-    position: absolute; 
-    left: -26px; 
-    top: 0; 
-    width: 10px; 
-    height: 10px; 
-    border-radius: 50%; 
-    background: var(--bg-card); 
-    border: 2px solid var(--accent); 
-    z-index: 1; 
-}
-.timeline-item.is-last .timeline-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--bg-card); }
-.timeline-content { background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; line-height: 1.5; color: var(--text-main); }
-.timeline-date { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: block;}
+        .timeline { position: relative; padding-left: 20px; margin-top: 20px; }
+        .timeline-item { position: relative; margin-bottom: 25px; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 5px;
+            bottom: -25px;
+            width: 2px;
+            background: var(--accent);
+        }
+        .timeline-item.is-last { margin-bottom: 0; }
+        .timeline-item.is-last::before { display: none; }
+        .timeline-dot { 
+            position: absolute; 
+            left: -26px; 
+            top: 0; 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            background: var(--bg-card); 
+            border: 2px solid var(--accent); 
+            z-index: 1; 
+        }
+        .timeline-item.is-last .timeline-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--bg-card); }
+        .timeline-content { background: var(--bg-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; line-height: 1.5; color: var(--text-main); }
+        .timeline-date { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: block;}
 
         .content-divider { border: 0; border-top: 1px solid var(--divider-color); margin: 25px 0; }
 
@@ -637,7 +643,7 @@
         <span><strong>Gurrr... wir haben die Verbindung verloren, ich arbeite dran!</strong></span>
     </div>
 
-    <!-- NEU: Pull to refresh Indicator -->
+    <!-- Pull to refresh Indicator -->
     <div id="pull-indicator">🐎 Ziehen zum Aktualisieren...</div>
     
     <div id="start" class="screen-content active">
@@ -737,6 +743,12 @@
                 Güldengossaer Str. 18c, 04288 Leipzig<br>
                 <a href="https://www.lebendigegeschichte-lww.de" target="_blank">www.lebendigegeschichte-lww.de</a>
             </p>
+            <hr class="impressum-divider">
+            <p style="text-align: center; margin-bottom: 0;">
+                <a href="https://lebendigegeschichte-lww.de/datenschutz#1813app" target="_blank" rel="noopener" style="font-weight: bold; color: var(--accent);">
+                    🔒 Datenschutzerklärung
+                </a>
+            </p>
         </div>
     </div>
 
@@ -764,7 +776,7 @@
         <div id="sub-lageplan" class="sub-content">
             <div class="map-hint">💡 Nutze zwei Finger, um die Karte zu bewegen und zu zoomen.</div>
             
-            <!-- NEU: 2-Klick uMap Integration für den Lageplan -->
+            <!-- 2-Klick uMap Integration für den Lageplan -->
             <div class="map-container-wrapper">
                 <div class="map-consent-box">
                     <p><strong>Externe Karte von umap/Openstreetmap. Durch Tippen auf "Laden" wird diese Karte geladen.</strong></p>
@@ -837,26 +849,39 @@
             <h2>Abfahrtszeiten Live</h2>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Hier siehst du die nächsten Abfahrten direkt vor Ort.</p>
             
+            <!-- Bus Monitor -->
             <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #fbc10f;" open>
                 <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
                     <span>🚍 Bus (Schwarzes Ross)</span>
                 </summary>
-                <div style="padding: 5px; background: var(--bg-card);">
-                    <div id="bus-iframe-container" style="position: relative; width: 100%; height: 600px;">
-                        <iframe src="https://stationboard.l.de/monitor/0012542?bgh=fbc10f&ch=032c58&headertext=Schwarzes%20Ross&showheader=1&bgodd=094d98&codd=ffffff&bgeven=093f70&ceven=ffffff&bgsh=09477f&csh=ffffff&numrows=5&walktime=0&showtrack=0&showtransportType=0&transporttypes=bahn_bus_sbahn_tram_rufbus" 
+                <div style="padding: 10px; background: var(--bg-card);">
+                    <div id="bus-iframe-container" style="position: relative; width: 100%; height: 330px; -webkit-overflow-scrolling: touch; overflow-y: auto; border-radius: 8px;">
+                        <iframe src="https://www.vvo-online.de/de/dm/1/0075bf/fff/0/5/27012542?a=Schwarzes%20Ross" 
                                 style="width: 100%; height: 100%; border: none; border-radius: 6px;"
                                 id="bus-monitor-frame">
                         </iframe>
                     </div>
+                    <a href="https://www.vvo-online.de/de/dm/1/0075bf/fff/0/5/27012542?a=Schwarzes%20Ross" target="_blank" rel="noopener" class="feedback-btn secondary-btn" style="text-align: center; margin-top: 10px; text-decoration: none;">
+                        🔗 Live-Abfahrten im Browser öffnen
+                    </a>
                 </div>
             </details>
 
+            <!-- Zug Monitor -->
             <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid #094d98;">
                 <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
                     <span>🚆 Zug (Bahnhof Liebertwolkwitz)</span>
                 </summary>
-                <div style="text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 14px; font-style: italic;">
-                    Diese Haltestelle wird gerade errichtet 🔨
+                <div style="padding: 10px; background: var(--bg-card);">
+                    <div id="zug-iframe-container" style="position: relative; width: 100%; height: 330px; -webkit-overflow-scrolling: touch; overflow-y: auto; border-radius: 8px;">
+                        <iframe src="https://www.vvo-online.de/de/dm/1/0075bf/fff/0/5/27099006?a=Bahnhof%20Liebertwolkwitz" 
+                                style="width: 100%; height: 100%; border: none; border-radius: 6px;"
+                                id="zug-monitor-frame">
+                        </iframe>
+                    </div>
+                    <a href="https://www.vvo-online.de/de/dm/1/0075bf/fff/0/5/27099006?a=Bahnhof%20Liebertwolkwitz" target="_blank" rel="noopener" class="feedback-btn secondary-btn" style="text-align: center; margin-top: 10px; text-decoration: none;">
+                        🔗 Live-Abfahrten im Browser öffnen
+                    </a>
                 </div>
             </details>
         </div>
@@ -886,7 +911,7 @@
         <div id="sub-hist-karte" class="sub-content active">
             <div class="map-hint">💡 Nutze zwei Finger, um die Karte zu bewegen und zu zoomen.</div>
             
-            <!-- NEU: 2-Klick uMap Integration für die Apelsteine -->
+            <!-- 2-Klick uMap Integration für die Apelsteine -->
             <div class="map-container-wrapper">
                 <div class="map-consent-box">
                     <p><strong>Externe Karte von umap/Openstreetmap. Durch Tippen auf "Laden" wird diese Karte geladen.</strong></p>
@@ -946,6 +971,13 @@
         </button>
 
         <h1>Mehr Links</h1>
+
+        <a href="https://lebendigegeschichte-lww.de/datenschutz#1813app" target="_blank" rel="noopener" class="linktree-btn">
+            <div class="icon-wrapper">
+                <span class="fallback-emoji">🔒</span>
+            </div>
+            <strong>Datenschutzerklärung</strong>
+        </a>
         
         <a href="https://www.liebertwolkwitz-1813.de" target="_blank" class="linktree-btn" style="border-left-width: 6px;">
             <div class="icon-wrapper">
@@ -1033,7 +1065,19 @@
         <div id="nav-btn-veranstaltungen" class="nav-item" onclick="switchTab('veranstaltungen', this)">📅<br>Termine</div>
         <div id="nav-btn-historisches" class="nav-item" onclick="switchTab('historisches', this)">⚔️<br>Historisches</div>
     </div>
-</div>
+    
+    <!-- Wegklickbares Datenschutz-Banner -->
+    <div id="privacy-banner" style="display: none; position: absolute; bottom: 65px; left: 10px; right: 10px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); padding: 12px 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); z-index: 500; font-size: 12px; line-height: 1.4;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div>
+                Diese Web-App verarbeitet personenbezogene Daten und nutzt Drittanbeiter. Das ist für den Betrieb unerlässlich (Funktionell). Infos findest du in unserer 
+                <a href="https://lebendigegeschichte-lww.de/datenschutz#1813app" target="_blank" rel="noopener" style="font-weight: bold; color: var(--link-color);">Datenschutzerklärung</a>.
+            </div>
+            <button onclick="acceptPrivacyBanner()" style="background: var(--accent); color: #ffffff; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 11px; white-space: nowrap;">
+                Verstanden ✖️
+            </button>
+        </div>
+    </div>
 
 <script>
     if ('serviceWorker' in navigator) {
@@ -1832,7 +1876,6 @@
         container.innerHTML = html;
     }
 
-    // NEU: Rendering-Funktion für die dynamische Chronik inkl. Abschluss ("is-last")
     function renderTimeline() {
         const container = document.getElementById('timeline-list');
         if(!container) return;
@@ -1865,14 +1908,6 @@
         html += '</div>';
         
         container.innerHTML = html;
-
-        // Passt die vertikale Linie dynamisch an, damit sie genau beim letzten Punkt endet
-        const lastDot = container.querySelector('.timeline-item.is-last');
-        const timelineBox = container.querySelector('.timeline');
-        if (lastDot && timelineBox) {
-            const offsetTop = lastDot.offsetTop;
-            timelineBox.style.setProperty('--line-height', `${offsetTop}px`);
-        }
     }
 
     function showStarTooltip(event) {
@@ -2028,7 +2063,6 @@
         }
     }
 
-    // NEU: In-App Feedback senden Logik
     function submitInAppFeedback() {
         const msgInput = document.getElementById('fb-message');
         const contactInput = document.getElementById('fb-contact');
@@ -2068,7 +2102,6 @@
             });
     }
 
-    // Lädt uMap dynamisch nach Einwilligung (2-Klick) oder zeigt bei Offline-Status das Fallback-Bild
     function loadUmap(button, mapUrl) {
         const wrapper = button.closest('.map-container-wrapper');
         const consentBox = wrapper.querySelector('.map-consent-box');
@@ -2114,7 +2147,6 @@
             </div>`;
     }
 
-    // NEU: Pull to Refresh Logik
     let touchStartY = 0;
     let touchMoveY = 0;
     const pullIndicator = document.getElementById('pull-indicator');
@@ -2132,9 +2164,14 @@
         if (!touchStartY) return;
         touchMoveY = e.touches[0].clientY;
         const distance = touchMoveY - touchStartY;
+        const activeScreen = document.querySelector('.screen-content.active');
 
-        if (distance > 0 && distance < 120) {
-            pullIndicator.style.height = `${distance / 2}px`;
+        if (distance > 0 && distance < 120 && activeScreen) {
+            const moveAmount = Math.min(distance * 0.45, 55);
+            activeScreen.style.transform = `translateY(${moveAmount}px)`;
+            activeScreen.style.transition = 'none';
+
+            pullIndicator.style.opacity = '1';
             pullIndicator.innerText = distance > 80 ? "🐎 Loslassen zum Aktualisieren..." : "🐎 Ziehen zum Aktualisieren...";
         }
     }, { passive: true });
@@ -2142,30 +2179,55 @@
     document.addEventListener('touchend', () => {
         if (!touchStartY || !touchMoveY) return;
         const distance = touchMoveY - touchStartY;
+        const activeScreen = document.querySelector('.screen-content.active');
 
-        if (distance > 80) {
-            pullIndicator.style.height = "40px";
-            pullIndicator.innerText = "🔄 Daten werden aktualisiert...";
-            
-            // Lade alle Daten neu
-            fetchProgramData();
-            fetchLocationData();
-            fetchYearlyData();
-            fetchFaqData();
-            fetchLexikonData();
-            fetchGazetteData();
-            fetchCountdownData();
-            fetchTimelineData();
+        if (activeScreen) {
+            activeScreen.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
 
-            setTimeout(() => {
-                pullIndicator.style.height = "0";
-            }, 1200);
-        } else {
-            pullIndicator.style.height = "0";
+            if (distance > 80) {
+                activeScreen.style.transform = 'translateY(45px)';
+                pullIndicator.innerText = "🔄 Daten werden aktualisiert...";
+                
+                fetchProgramData();
+                fetchLocationData();
+                fetchYearlyData();
+                fetchFaqData();
+                fetchLexikonData();
+                fetchGazetteData();
+                fetchCountdownData();
+                fetchTimelineData();
+
+                setTimeout(() => {
+                    activeScreen.style.transform = 'translateY(0)';
+                    setTimeout(() => {
+                        pullIndicator.style.opacity = '0';
+                    }, 300);
+                }, 1000);
+            } else {
+                activeScreen.style.transform = 'translateY(0)';
+                pullIndicator.style.opacity = '0';
+            }
         }
         touchStartY = 0;
         touchMoveY = 0;
     });
+
+    // Datenschutz-Banner Logik
+    function checkPrivacyBanner() {
+        const accepted = localStorage.getItem('privacy-accepted');
+        if (!accepted) {
+            const banner = document.getElementById('privacy-banner');
+            if (banner) banner.style.display = 'block';
+        }
+    }
+
+    function acceptPrivacyBanner() {
+        localStorage.setItem('privacy-accepted', 'true');
+        const banner = document.getElementById('privacy-banner');
+        if (banner) banner.style.display = 'none';
+    }
+
+    window.addEventListener('DOMContentLoaded', checkPrivacyBanner);
 
 </script>
 
