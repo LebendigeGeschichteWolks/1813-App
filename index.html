@@ -492,7 +492,7 @@
             border-radius: 8px; 
             margin-bottom: 10px; 
             border-left: 4px solid var(--accent); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             color: var(--text-main); 
         }
         details.faq-item summary { 
@@ -518,6 +518,7 @@
             margin-top: 0; 
             padding-top: 10px; 
             color: var(--text-muted); 
+            white-space: pre-wrap; /* Zeilenumbrüche aus Sheets direkt rendern */
         }
         .dark-theme .faq-answer { color: #ffffff !important; }
         .dark-theme .faq-answer a { color: #88ccff !important; font-weight: bold; }
@@ -764,6 +765,9 @@
             
             <div id="sub-btn-umfrage" class="sub-grid-item" onclick="switchSubTabEvent('sub-umfrage', this)">🖊️ Umfrage</div>
             <div id="sub-btn-opnv" class="sub-grid-item" onclick="switchSubTabEvent('sub-opnv', this)">🚌🚂 ÖPNV</div>
+
+            <!-- NEU: Die Höfe (Volle Breite) -->
+            <div id="sub-btn-hoefe" class="sub-grid-item" style="grid-column: span 2;" onclick="switchSubTabEvent('sub-hoefe', this)">🌾 Die Höfe</div>
         </div>
 
         <div id="sub-programm" class="sub-content active">
@@ -884,6 +888,16 @@
                     </a>
                 </div>
             </details>
+        </div>
+
+        <!-- NEU: Subtab "Die Höfe" -->
+        <div id="sub-hoefe" class="sub-content">
+            <h2>Die Höfe des Dorfes</h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Entdecke die historischen Höfe und ihre Geschichten.</p>
+            
+            <div id="hoefe-list">
+                <div class="loader">Die Höfe werden geöffnet...</div>
+            </div>
         </div>
     </div>
 
@@ -1066,7 +1080,7 @@
         <div id="nav-btn-historisches" class="nav-item" onclick="switchTab('historisches', this)">⚔️<br>Historisches</div>
     </div>
     
-    <!-- Wegklickbares Datenschutz-Banner -->
+    <!-- Wegklickbares Datenschutz-Banner (Darkmode-kompatibel) -->
     <div id="privacy-banner" style="display: none; position: absolute; bottom: 65px; left: 10px; right: 10px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); padding: 12px 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); z-index: 500; font-size: 12px; line-height: 1.4;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
             <div>
@@ -1078,6 +1092,7 @@
             </button>
         </div>
     </div>
+</div>
 
 <script>
     if ('serviceWorker' in navigator) {
@@ -1096,12 +1111,14 @@
     const GAZETTE_URL = BASE_SCRIPT_URL + "?action=gazette";
     const COUNTDOWN_URL = BASE_SCRIPT_URL + "?action=countdown";
     const TIMELINE_URL = BASE_SCRIPT_URL + "?action=timeline"; 
+    const HOEFE_URL = BASE_SCRIPT_URL + "?action=hoefe";
 
     let globalEvents = [];
     let globalLocations = [];
     let globalYearlyEvents = []; 
     let globalLexikon = [];
     let globalTimeline = []; 
+    let globalHoefe = [];
     let detectedDays = []; 
     let currentDayIndex = 0; 
     let preLinktreeTab = 'start'; 
@@ -1171,6 +1188,7 @@
         fetchGazetteData();
         fetchCountdownData();
         fetchTimelineData(); 
+        fetchHoefeData();
     }
 
     function loadFromCache() {
@@ -1197,6 +1215,9 @@
         
         const cTime = localStorage.getItem('cache-timeline'); 
         if(cTime) { globalTimeline = JSON.parse(cTime); renderTimeline(); }
+
+        const cHoefe = localStorage.getItem('cache-hoefe');
+        if(cHoefe) { globalHoefe = JSON.parse(cHoefe); renderHoefe(); }
     }
 
     function parseGermanDate(dateStr, timeStr) {
@@ -1423,6 +1444,10 @@
         document.getElementById(subTabId).classList.add('active');
         element.classList.add('active');
         localStorage.setItem('last-sub-tab-event', subTabId);
+
+        if (subTabId === 'sub-hoefe') {
+            renderHoefe();
+        }
     }
 
     function restoreLastSession() {
@@ -1876,6 +1901,66 @@
         container.innerHTML = html;
     }
 
+    // NEU: Function for rendering Höfe in accordion/details style
+    function renderHoefe() {
+        const container = document.getElementById('hoefe-list');
+        if(!container) return;
+        container.innerHTML = "";
+        
+        if(!globalHoefe || globalHoefe.length === 0) {
+            container.innerHTML = '<div class="loader">Keine Höfe-Einträge gefunden.</div>';
+            return;
+        }
+
+        const filtered = globalHoefe.filter(item => {
+            return item.anzeigen && item.anzeigen.trim().toLowerCase() === 'ja';
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="loader">Keine aktiven Höfe gefunden.</div>';
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(item => {
+            let imgHtml = '';
+            if (item.bild && item.bild.trim() !== '') {
+                let bildPfad = item.bild.trim();
+                bildPfad = bildPfad.replace(/<[^>]*>/g, '').trim();
+
+                if (!bildPfad.startsWith('images/hoefe/')) {
+                    if (bildPfad.startsWith('images/')) {
+                        bildPfad = bildPfad.replace('images/', 'images/hoefe/');
+                    } else {
+                        bildPfad = 'images/hoefe/' + bildPfad;
+                    }
+                }
+                imgHtml = `<div class="lexikon-img-container" style="margin-top: 5px; margin-bottom: 10px;"><img src="${bildPfad}" alt="${item.titel || 'Hof'}" onerror="handleImageError(this)"></div>`;
+            }
+
+            let beschreibungText = (item.beschreibung || '').trim();
+            let angeboteText = (item.angebote || '').trim();
+
+            let textInhalt = beschreibungText;
+            if (angeboteText !== '') {
+                if (textInhalt !== '') textInhalt += '\n\n';
+                textInhalt += '<b>📌 Angebote auf dem Hof:</b>\n' + angeboteText;
+            }
+
+            html += `
+            <details class="faq-item" style="margin-bottom: 12px; border-left: 4px solid var(--accent);">
+                <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
+                    <span>${item.titel || 'Hof'}</span>
+                </summary>
+                <div class="faq-answer" style="padding: 12px 15px; border-top: 1px dashed var(--border-color); font-size: 14px; line-height: 1.5;">
+                    ${imgHtml}${textInhalt}
+                </div>
+            </details>`;
+        });
+
+        container.innerHTML = html;
+    }
+
     function renderTimeline() {
         const container = document.getElementById('timeline-list');
         if(!container) return;
@@ -2050,6 +2135,19 @@
             }).catch(err => console.log("Fehler Chronik", err));
     }
 
+    function fetchHoefeData() {
+        fetch(HOEFE_URL)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) return;
+                if (data && data.length > 0) {
+                    localStorage.setItem('cache-hoefe', JSON.stringify(data));
+                    globalHoefe = data;
+                    renderHoefe();
+                }
+            }).catch(err => console.log("Fehler Höfe", err));
+    }
+
     function toggleDarkMode() {
         const phone = document.getElementById('phone');
         const icon = document.getElementById('theme-icon');
@@ -2196,6 +2294,7 @@
                 fetchGazetteData();
                 fetchCountdownData();
                 fetchTimelineData();
+                fetchHoefeData();
 
                 setTimeout(() => {
                     activeScreen.style.transform = 'translateY(0)';
