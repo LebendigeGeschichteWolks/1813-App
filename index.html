@@ -16,6 +16,7 @@
     <!-- Favicon für Browser-Tabs & Firefox Android -->
     <link rel="icon" type="image/png" sizes="192x192" href="images/icons/icon-192.png">
     <link rel="apple-touch-icon" href="images/icons/icon-192.png">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <style>
         /* Historische Überschriften-Schrift */
@@ -230,7 +231,7 @@
             to { transform: translateY(0); }
         }
 
-        /* Pull-to-Refresh Indikator (liegt hinter der verschiebbaren Seite) */
+        /* Pull-to-Refresh Indikator */
         #pull-indicator {
             position: absolute;
             top: 50px;
@@ -249,7 +250,6 @@
             transition: opacity 0.2s ease;
         }
 
-        /* Der Inhaltsbereich deckt den Indikator ab und lässt sich flüssig ziehen */
         .screen-content {
             flex: 1;
             padding: 15px;
@@ -656,7 +656,7 @@
         <span><strong>Gurrr... wir haben die Verbindung verloren, ich arbeite dran!</strong></span>
     </div>
 
-    <!-- NEU: Eilmeldungs-Banner (Der Dorfausrufer) -->
+    <!-- Eilmeldungs-Banner (Der Dorfausrufer) -->
     <div id="eilmeldung-banner" style="display: none; background: #8b0000; color: #ffffff; padding: 10px 15px; font-size: 13px; font-weight: bold; border-bottom: 2px solid #ffcc00; z-index: 95; position: relative; animation: slideDown 0.3s ease-out;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -716,11 +716,14 @@
                 <h3 style="margin-top:0;">✉️ Feedback & Depesche senden</h3>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Euer Feedback hilft uns, die App und das Dorf noch besser zu machen.</p>
                 
+                <!-- Verstecktes Honeypot-Feld gegen Spam-Bots -->
+                <input type="text" id="fb-hp" style="display:none !important;" tabindex="-1" autocomplete="off">
+
                 <textarea id="fb-message" class="search-input" style="height: 90px; resize: none;" placeholder="Deine Nachricht an uns..."></textarea>
                 <input type="text" id="fb-contact" class="search-input" placeholder="Name / E-Mail (optional für Rückfragen)">
                 
                 <button class="feedback-btn" style="width: 100%; border: none; cursor: pointer; margin: 10px 0 0 0;" onclick="submitInAppFeedback()">
-                    ✉️ Absenden
+                    ✉ Absenden
                 </button>
 
                 <p style="font-size: 11px; color: var(--text-muted); margin-top: 10px; margin-bottom: 0; text-align: center;">
@@ -779,18 +782,19 @@
     <div id="liebertwolkwitz" class="screen-content">
         <h1>Liebertwolkwitz 1813</h1>
         
+        <!-- Aktualisiertes 4x2 Raster Submenü -->
         <div class="sub-nav-grid">
             <div id="sub-btn-programm" class="sub-grid-item active" onclick="switchSubTabEvent('sub-programm', this)">📅 Programm</div>
             <div id="sub-btn-lageplan" class="sub-grid-item" onclick="switchSubTabEvent('sub-lageplan', this)">🗺️ Lageplan</div>
             
             <div id="sub-btn-wasistwo" class="sub-grid-item" onclick="switchSubTabEvent('sub-wasistwo', this)">📍 Was ist wo?</div>
-            <div id="sub-btn-faq" class="sub-grid-item" onclick="switchSubTabEvent('sub-faq', this)">❓ Fragen</div>
+            <div id="sub-btn-hoefe" class="sub-grid-item" onclick="switchSubTabEvent('sub-hoefe', this)">🌾 Die Höfe</div>
             
+            <div id="sub-btn-faq" class="sub-grid-item" onclick="switchSubTabEvent('sub-faq', this)">❓ Fragen</div>
             <div id="sub-btn-umfrage" class="sub-grid-item" onclick="switchSubTabEvent('sub-umfrage', this)">🖊️ Umfrage</div>
-            <div id="sub-btn-opnv" class="sub-grid-item" onclick="switchSubTabEvent('sub-opnv', this)">🚌🚂 ÖPNV</div>
 
-            <!-- Die Höfe (Volle Breite) -->
-            <div id="sub-btn-hoefe" class="sub-grid-item" style="grid-column: span 2;" onclick="switchSubTabEvent('sub-hoefe', this)">🌾 Die Höfe</div>
+            <div id="sub-btn-opnv" class="sub-grid-item" onclick="switchSubTabEvent('sub-opnv', this)">🚌🚂 ÖPNV</div>
+            <div id="sub-btn-wetter" class="sub-grid-item" onclick="switchSubTabEvent('sub-wetter', this)">🌤️ Wetter</div>
         </div>
 
         <div id="sub-programm" class="sub-content active">
@@ -922,6 +926,29 @@
                 <div class="loader">Die Höfe werden geöffnet...</div>
             </div>
         </div>
+
+        <!-- NEU: Subtab "Wetter" mit Opt-In -->
+        <div id="sub-wetter" class="sub-content">
+            <h2>Wetter in Liebertwolkwitz</h2>
+            
+            <div class="map-container-wrapper" id="weather-container-wrapper">
+                <div class="map-consent-box" id="weather-consent-box">
+                    <p><strong>Externe Wettervorhersage von Yr.no / MET Norway. Durch Tippen auf "Laden" werden die Wetter-Widgets geladen.</strong></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">
+                        Weitere Informationen zum Datenschutz von Yr / MET Norway findest du in der 
+                        <a href="https://hjelp.yr.no/hc/en-us/articles/360003337614-Privacy-policy" target="_blank" rel="noopener">Datenschutzerklärung</a>.
+                    </p>
+                    <button class="feedback-btn" style="margin: 15px auto 5px auto; width: 100%; max-width: 200px;" onclick="loadWeatherWidgets(this)">
+                        🌤️ Laden
+                    </button>
+                </div>
+                <div class="map-frame-holder" id="weather-frame-holder" style="display:none;"></div>
+            </div>
+
+            <p style="margin-top: 12px; font-size: 12px; text-align: center;">
+                <a href="https://www.yr.no/en/forecast/daily-table/2-2877922/Germany/Saxony/Direktionsbezirk%20Leipzig/Liebertwolkwitz" target="_blank" rel="noopener">Ausführliche Vorhersage auf Yr.no öffnen ↗</a>
+            </p>
+        </div>
     </div>
 
     <div id="veranstaltungen" class="screen-content">
@@ -1007,28 +1034,42 @@
             ✖️ Schließen
         </button>
 
-        <h1>Mehr Links</h1>
-        <!-- NEU: App Installieren Hinweis als Akkordeon hier oben -->
+        <!-- App Install Hint als Akkordeon im Linktree -->
         <details class="faq-item" style="margin-bottom: 15px; border-left: 4px solid var(--accent);">
             <summary style="background: var(--bg-card); font-size: 15px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
                 <span>📱 Als App auf dein Handy holen</span>
             </summary>
             <div class="faq-answer" style="padding: 12px 15px; border-top: 1px dashed var(--border-color); font-size: 13px; line-height: 1.5; background: var(--bg-card);">
-                <p style="margin-top:0; color: var(--text-muted); margin-bottom: 10px;">Du kannst diese Seite ganz einfach wie eine echte App auf deinem Startbildschirm speichern – völlig ohne App Store! <br>
-
-<strong>🤖 Android (Chrome / Firefox):</strong>
-Tippe oben oder unten auf die <strong>3 Punkte (⋮)</strong> ➔ wähle <strong>„App installieren“</strong> oder <strong>„Zum Startbildschirm hinzufügen“</strong> (oder tippe auf das <strong>+</strong> in der Adresszeile).
-                <br>
-<strong>🍏 iPhone / iPad (Safari):</strong>
-Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ wische nach unten und wähle <strong>„Zum Home-Bildschirm“</strong>.</p>
+                <p style="margin-top:0; color: var(--text-muted); margin-bottom: 10px;">Du kannst diese Seite ganz einfach wie eine echte App auf deinem Startbildschirm speichern – völlig ohne App Store!</p>
+                
+                <p style="margin-bottom: 10px;">
+                    <strong>🤖 Android (Chrome / Firefox):</strong><br>
+                    Tippe oben oder unten auf die <strong>3 Punkte (⋮)</strong> ➔ wähle <strong>„App installieren“</strong> oder <strong>„Zum Startbildschirm hinzufügen“</strong> (oder tippe auf das <strong>+</strong> in der Adresszeile).
+                </p>
+                
+                <p style="margin-bottom: 0;">
+                    <strong>🍏 iPhone / iPad (Safari):</strong><br>
+                    Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ wische nach unten und wähle <strong>„Zum Home-Bildschirm“</strong>.
+                </p>
             </div>
         </details>
+
+        <h1>Mehr Links</h1>
+
         <a href="https://lebendigegeschichte-lww.de/datenschutz#1813app" target="_blank" rel="noopener" class="linktree-btn">
             <div class="icon-wrapper">
                 <span class="fallback-emoji">🔒</span>
             </div>
             <strong>Datenschutzerklärung</strong>
         </a>
+
+        <!-- NEU: Einwilligungen widerrufen Button -->
+        <button onclick="revokeOptInConsent()" class="linktree-btn" style="width: 100%; cursor: pointer; border-left-color: #d35400; background-color: var(--bg-linktree-btn);">
+            <div class="icon-wrapper">
+                <span class="fallback-emoji">🔄</span>
+            </div>
+            <strong>Einwilligungen widerrufen</strong>
+        </button>
         
         <a href="https://www.liebertwolkwitz-1813.de" target="_blank" class="linktree-btn" style="border-left-width: 6px;">
             <div class="icon-wrapper">
@@ -1149,10 +1190,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
     const COUNTDOWN_URL = BASE_SCRIPT_URL + "?action=countdown";
     const TIMELINE_URL = BASE_SCRIPT_URL + "?action=timeline"; 
     const HOEFE_URL = BASE_SCRIPT_URL + "?action=hoefe";
-    
-    // NEU: URL und globales Array für den Dorfausrufer (Eilmeldungen)
     const EILMELDUNGEN_URL = BASE_SCRIPT_URL + "?action=eilmeldungen";
-    let globalEilmeldungen = [];
 
     let globalEvents = [];
     let globalLocations = [];
@@ -1160,6 +1198,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
     let globalLexikon = [];
     let globalTimeline = []; 
     let globalHoefe = [];
+    let globalEilmeldungen = [];
     let detectedDays = []; 
     let currentDayIndex = 0; 
     let preLinktreeTab = 'start'; 
@@ -1230,10 +1269,9 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
         fetchCountdownData();
         fetchTimelineData(); 
         fetchHoefeData();
-        
-        // NEU: Auf Eilmeldungen prüfen und minütlich aktualisieren
+
         fetchEilmeldungenData();
-        setInterval(checkAndRenderEilmeldungen, 60000);
+        setInterval(checkAndRenderEilmeldungen, 60000); 
     }
 
     function loadFromCache() {
@@ -1264,7 +1302,6 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
         const cHoefe = localStorage.getItem('cache-hoefe');
         if(cHoefe) { globalHoefe = JSON.parse(cHoefe); renderHoefe(); }
 
-        // NEU: Eilmeldungen aus Cache checken
         const cEil = localStorage.getItem('cache-eilmeldungen');
         if(cEil) { globalEilmeldungen = JSON.parse(cEil); checkAndRenderEilmeldungen(); }
     }
@@ -1871,7 +1908,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
             "Personen": "👤",
             "Militärische Begriffe": "🛡️",
             "Allgemein": "📖",
-            "Orte & Denkmäler": "🏛️️",
+            "Orte & Denkmäler": "🏛️",
             "Zivilleben": "🕊️",
             "Kleidung & Uniformen": "🎩",
             "Standard": "🗞️" 
@@ -2196,7 +2233,6 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
             }).catch(err => console.log("Fehler Höfe", err));
     }
 
-    // NEU: Funktionen für Eilmeldungen (Dorfausrufer)
     function fetchEilmeldungenData() {
         fetch(EILMELDUNGEN_URL)
             .then(response => response.json())
@@ -2238,6 +2274,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
 
         if (activeMeldung) {
             textElem.innerHTML = activeMeldung.meldung;
+            banner.setAttribute('data-current-meldung', activeMeldung.meldung);
             banner.style.display = 'block';
         } else {
             banner.style.display = 'none';
@@ -2245,12 +2282,26 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
     }
 
     function dismissEilmeldung() {
-        const textElem = document.getElementById('eilmeldung-text');
         const banner = document.getElementById('eilmeldung-banner');
-        if (textElem && banner) {
-            sessionStorage.setItem('dismissed-eilmeldung', textElem.innerHTML);
+        if (banner) {
+            const currentMeldung = banner.getAttribute('data-current-meldung');
+            if(currentMeldung) {
+                sessionStorage.setItem('dismissed-eilmeldung', currentMeldung);
+            }
             banner.style.display = 'none';
         }
+    }
+
+    function updateYrTheme() {
+        const phone = document.getElementById('phone');
+        const isDark = phone && phone.classList.contains('dark-theme');
+        const modeParam = isDark ? '?mode=dark' : '';
+        
+        const cardFrame = document.getElementById('yr-card-frame');
+        const tableFrame = document.getElementById('yr-table-frame');
+        
+        if (cardFrame) cardFrame.src = `https://www.yr.no/en/content/2-2877922/card.html${modeParam}`;
+        if (tableFrame) tableFrame.src = `https://www.yr.no/en/content/2-2877922/table.html${modeParam}`;
     }
 
     function toggleDarkMode() {
@@ -2264,9 +2315,14 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
             icon.innerText = '🌙';
             localStorage.setItem('app-theme', 'light');
         }
+        updateYrTheme();
     }
 
     function submitInAppFeedback() {
+        // Honeypot Schutz gegen Spam-Bots
+        const hp = document.getElementById('fb-hp');
+        if (hp && hp.value !== "") return;
+
         const msgInput = document.getElementById('fb-message');
         const contactInput = document.getElementById('fb-contact');
         const statusDiv = document.getElementById('fb-status');
@@ -2305,6 +2361,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
             });
     }
 
+    // Opt-In Ladefunktion für Maps
     function loadUmap(button, mapUrl) {
         const wrapper = button.closest('.map-container-wrapper');
         const consentBox = wrapper.querySelector('.map-consent-box');
@@ -2324,6 +2381,66 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
         frameHolder.innerHTML = `<iframe class="map-iframe" style="width: 100%; height: 340px; border: 0; border-radius: 10px;" allowfullscreen allow="geolocation" src="${mapUrl}"></iframe>`;
         consentBox.style.display = 'none';
         frameHolder.style.display = 'block';
+    }
+
+    // Opt-In Ladefunktion für das Yr.no Wetter
+    function loadWeatherWidgets(button) {
+        const wrapper = button ? button.closest('.map-container-wrapper') : document.getElementById('weather-container-wrapper');
+        if (!wrapper) return;
+        const consentBox = wrapper.querySelector('#weather-consent-box');
+        const frameHolder = wrapper.querySelector('#weather-frame-holder');
+
+        if (!navigator.onLine) {
+            frameHolder.innerHTML = `
+                <div style="text-align: center; padding: 15px; background-color: var(--bg-card); border-radius: 10px; border: 1px solid var(--border-color);">
+                    <p style="font-weight:bold; margin:0; font-size:14px; color:var(--text-main);">Keine Verbindung zum Wetterdienst. Prüfe deine Verbindung!📯</p>
+                </div>`;
+            if (consentBox) consentBox.style.display = 'none';
+            frameHolder.style.display = 'block';
+            return;
+        }
+
+        const isDark = document.getElementById('phone').classList.contains('dark-theme');
+        const modeParam = isDark ? '?mode=dark' : '';
+
+        frameHolder.innerHTML = `
+            <!-- 24h Wetter-Karte -->
+            <div class="card" style="padding: 10px; text-align: center; margin-bottom: 15px;">
+                <iframe id="yr-card-frame" src="https://www.yr.no/en/content/2-2877922/card.html${modeParam}" 
+                        style="width: 100%; height: 380px; border: none; border-radius: 8px; overflow: hidden;" scrolling="no">
+                </iframe>
+            </div>
+
+            <!-- 9-Tage Wetter-Tabelle -->
+            <details class="faq-item" style="margin-top: 15px; border-left: 4px solid var(--accent);" open>
+                <summary style="background: var(--bg-card); font-size: 14px; padding: 12px 15px; font-weight: bold; cursor: pointer;">
+                    <span>📋 Kompakte Vorhersage (Tabelle)</span>
+                </summary>
+                <div style="padding: 10px; background: var(--bg-card); text-align: center;">
+                    <iframe id="yr-table-frame" src="https://www.yr.no/en/content/2-2877922/table.html${modeParam}" 
+                            style="width: 100%; height: 450px; border: none; border-radius: 8px; overflow: hidden;">
+                    </iframe>
+                </div>
+            </details>
+        `;
+
+        if (consentBox) consentBox.style.display = 'none';
+        frameHolder.style.display = 'block';
+    }
+
+    // Funktion zum Widerrufen aller Opt-In-Einwilligungen
+    function revokeOptInConsent() {
+        document.querySelectorAll('.map-container-wrapper').forEach(wrapper => {
+            const consentBox = wrapper.querySelector('.map-consent-box');
+            const frameHolder = wrapper.querySelector('.map-frame-holder');
+            if (consentBox && frameHolder) {
+                frameHolder.innerHTML = '';
+                frameHolder.style.display = 'none';
+                consentBox.style.display = 'block';
+            }
+        });
+
+        alert('Deine Einwilligungen für externe Medien (Karten & Wetter) wurden widerrufen.');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -2400,7 +2517,7 @@ Tippe unten auf das <strong>Teilen-Symbol</strong> (Quadrat mit Pfeil 📤) ➔ 
                 fetchCountdownData();
                 fetchTimelineData();
                 fetchHoefeData();
-                fetchEilmeldungenData(); // NEU: Zieht auch beim Pull-to-Refresh die neuen Eilmeldungen
+                fetchEilmeldungenData();
 
                 setTimeout(() => {
                     activeScreen.style.transform = 'translateY(0)';
